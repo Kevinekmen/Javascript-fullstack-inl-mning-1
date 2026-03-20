@@ -1,0 +1,24 @@
+{
+  "name": "javascript-fullstack-inl-mning-1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "scripts": {
+  "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kevinekmen/Javascript-fullstack-inl-mning-1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Kevinekmen/Javascript-fullstack-inl-mning-1/issues"
+  },
+  "homepage": "https://github.com/Kevinekmen/Javascript-fullstack-inl-mning-1#readme",
+  "devDependencies": {
+    "jest": "^30.3.0"
+  }
+}

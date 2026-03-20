@@ -50,7 +50,6 @@ function checkGuess(guess, correctWord) {
 //Test 4: LEPPA vs APPLE
 //Syfte: kontrollera misplacerade bokstäver
 
-console.log(checkGuess("HELLO", "HALLÅ"));
-console.log(checkGuess("APPLE", "APPLE"));
-console.log(checkGuess("AAAAA", "APPLE"));
-console.log(checkGuess("LEPPA", "APPLE"));
+
+
+module.exports = checkGuess;
