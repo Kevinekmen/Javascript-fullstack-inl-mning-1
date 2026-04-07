@@ -2,9 +2,11 @@
   "name": "javascript-fullstack-inl-mning-1",
   "version": "1.0.0",
   "description": "",
-  "main": "test.js",
+  "main": "server.js",
   "scripts": {
-  "test": "jest"
+    "start": "node server.js",
+    "build": "cd client && npm install && npm run build",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -18,6 +20,10 @@
     "url": "https://github.com/Kevinekmen/Javascript-fullstack-inl-mning-1/issues"
   },
   "homepage": "https://github.com/Kevinekmen/Javascript-fullstack-inl-mning-1#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongodb": "^6.3.0"
+  },
   "devDependencies": {
     "jest": "^30.3.0"
   }
