@@ -7,7 +7,46 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'client/dist')));
 
-// API: Hämta slumpmässigt ord
+const navHTML = `
+  <nav style="display:flex;gap:24px;padding:16px 32px;background:#16213e;border-bottom:1px solid #0f3460;">
+    <a href="/" style="color:#e94560;text-decoration:none;font-weight:bold;letter-spacing:1px;">🎮 Spela</a>
+    <a href="/highscore" style="color:#e94560;text-decoration:none;font-weight:bold;letter-spacing:1px;">🏆 Highscore</a>
+    <a href="/om" style="color:#e94560;text-decoration:none;font-weight:bold;letter-spacing:1px;">ℹ️ Om</a>
+  </nav>
+`;
+
+const baseStyle = `
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: #1a1a2e;
+      color: #eee;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    h1 {
+      font-size: 2rem;
+      color: #e94560;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .card {
+      background: #16213e;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+  </style>
+`;
+
+
 app.get('/api/word', async (req, res) => {
   const length = parseInt(req.query.length) || 5;
   const unique = req.query.unique === 'true';
@@ -16,7 +55,7 @@ app.get('/api/word', async (req, res) => {
   res.json({ word });
 });
 
-// API: Spara highscore
+
 app.post('/api/highscore', async (req, res) => {
   const { name, time, guesses, settings } = req.body;
   if (!name || !time || !guesses || !settings) {
@@ -33,7 +72,7 @@ app.post('/api/highscore', async (req, res) => {
   res.json({ ok: true });
 });
 
-// Highscore-sida (server-side renderad)
+// Highscore-sida
 app.get('/highscore', async (req, res) => {
   const db = getDB();
   const scores = await db.collection('highscores')
@@ -42,13 +81,15 @@ app.get('/highscore', async (req, res) => {
     .limit(20)
     .toArray();
 
+  const medals = ['🥇', '🥈', '🥉'];
+
   const rows = scores.map((s, i) => `
-    <tr>
-      <td>${i + 1}</td>
-      <td>${s.name}</td>
-      <td>${(s.time / 1000).toFixed(1)}s</td>
-      <td>${s.guesses.length}</td>
-      <td>${s.settings.length} bokstäver${s.settings.unique ? ', unika' : ''}</td>
+    <tr style="border-bottom:1px solid #0f3460;">
+      <td style="padding:14px 16px;color:#e94560;font-weight:bold;">${medals[i] || i + 1}</td>
+      <td style="padding:14px 16px;font-weight:bold;">${s.name}</td>
+      <td style="padding:14px 16px;color:#4caf50;">${(s.time / 1000).toFixed(1)}s</td>
+      <td style="padding:14px 16px;color:#aaa;">${s.guesses.length} gissningar</td>
+      <td style="padding:14px 16px;color:#aaa;">${s.settings.length} bokstäver${s.settings.unique ? ', unika' : ''}</td>
     </tr>
   `).join('');
 
@@ -58,23 +99,41 @@ app.get('/highscore', async (req, res) => {
     <head>
       <meta charset="UTF-8">
       <title>Highscore – Wordle</title>
+      ${baseStyle}
       <style>
-        body { font-family: sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 10px 14px; border-bottom: 1px solid #ddd; text-align: left; }
-        th { background: #f5f5f5; }
-        nav a { margin-right: 16px; color: #4a90d9; text-decoration: none; }
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 12px 16px; text-align: left; color: #888; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; border-bottom: 2px solid #0f3460; }
+        tr:hover { background: #0f3460; }
+        .empty { text-align: center; color: #888; padding: 40px 0; }
       </style>
     </head>
     <body>
-      <nav><a href="/">Spela</a><a href="/highscore">Highscore</a><a href="/om">Om</a></nav>
-      <h1>🏆 Highscore</h1>
-      ${scores.length === 0 ? '<p>Inga resultat än. Spela spelet!</p>' : `
-        <table>
-          <thead><tr><th>#</th><th>Namn</th><th>Tid</th><th>Gissningar</th><th>Inställningar</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      `}
+      ${navHTML}
+      <div class="container">
+        <h1>🏆 Highscore</h1>
+        <div class="card">
+          ${scores.length === 0 ? `
+            <div class="empty">
+              <p style="font-size:3rem;">🎮</p>
+              <p style="margin-top:12px;">Inga resultat än – spela spelet!</p>
+              <a href="/" style="display:inline-block;margin-top:16px;padding:10px 24px;background:#e94560;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;">Spela nu</a>
+            </div>
+          ` : `
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Namn</th>
+                  <th>Tid</th>
+                  <th>Gissningar</th>
+                  <th>Inställningar</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          `}
+        </div>
+      </div>
     </body>
     </html>
   `);
@@ -88,28 +147,84 @@ app.get('/om', (req, res) => {
     <head>
       <meta charset="UTF-8">
       <title>Om – Wordle</title>
+      ${baseStyle}
       <style>
-        body { font-family: sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; }
-        nav a { margin-right: 16px; color: #4a90d9; text-decoration: none; }
+        .feedback-box {
+          display: flex;
+          gap: 12px;
+          margin: 12px 0;
+          align-items: center;
+        }
+        .tile {
+          width: 48px;
+          height: 48px;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          font-size: 20px;
+          color: #fff;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .tile-label {
+          color: #aaa;
+          font-size: 14px;
+        }
+        p { color: #ccc; line-height: 1.7; margin-bottom: 16px; }
+        h2 { color: #e94560; margin: 24px 0 12px; font-size: 1.1rem; letter-spacing: 1px; text-transform: uppercase; }
+        .tech { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+        .badge {
+          background: #0f3460;
+          color: #e94560;
+          padding: 6px 14px;
+          border-radius: 20px;
+          font-size: 13px;
+          font-weight: bold;
+        }
       </style>
     </head>
     <body>
-      <nav><a href="/">Spela</a><a href="/highscore">Highscore</a><a href="/om">Om</a></nav>
-      <h1>Om projektet</h1>
-      <p>Detta är ett Wordle-inspirerat spel byggt med Node.js, Express, React och MongoDB.</p>
-      <p>Spelet går ut på att gissa ett hemligt ord. Efter varje gissning får du feedback:</p>
-      <ul>
-        <li>🟢 <strong>Grön</strong> – rätt bokstav på rätt plats</li>
-        <li>🟡 <strong>Gul</strong> – bokstaven finns i ordet men på fel plats</li>
-        <li>🔴 <strong>Röd</strong> – bokstaven finns inte i ordet</li>
-      </ul>
-      <p>Du kan välja hur långt ordet ska vara och om bokstäver får upprepas.</p>
+      ${navHTML}
+      <div class="container">
+        <h1>ℹ️ Om projektet</h1>
+        <div class="card">
+          <h2>Vad är det här?</h2>
+          <p>Ett Wordle inspirerat spel där du gissar ett hemligt ord. Du väljer själv hur långt ordet ska vara.</p>
+
+          <h2>Hur spelar man?</h2>
+          <p>Skriv in ett ord och tryck på "Gissa". Du får direkt feedback på varje bokstav:</p>
+
+          <div class="feedback-box">
+            <div class="tile" style="background:#4caf50;">A</div>
+            <span class="tile-label">Rätt bokstav på rätt plats</span>
+          </div>
+          <div class="feedback-box">
+            <div class="tile" style="background:#ff9800;">B</div>
+            <span class="tile-label">Bokstaven finns i ordet men på fel plats</span>
+          </div>
+          <div class="feedback-box">
+            <div class="tile" style="background:#c0392b;">C</div>
+            <span class="tile-label">Bokstaven finns inte i ordet</span>
+          </div>
+
+          <h2>Tekniker</h2>
+          <p>Spelet är byggt med följande tekniker:</p>
+          <div class="tech">
+            <span class="badge">Node.js</span>
+            <span class="badge">Express</span>
+            <span class="badge">React</span>
+            <span class="badge">Vite</span>
+            <span class="badge">MongoDB</span>
+          </div>
+        </div>
+      </div>
     </body>
     </html>
   `);
 });
 
-// Alla övriga routes → React-appen
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/dist/index.html'));
 });

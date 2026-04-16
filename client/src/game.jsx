@@ -1,9 +1,177 @@
 import React, { useState } from 'react';
 
+const styles = {
+  page: {
+    minHeight: '100vh',
+    background: '#1a1a2e',
+    color: '#eee',
+    fontFamily: "'Segoe UI', sans-serif",
+    paddingBottom:'60px',
+    width:'100%',
+  },
+  nav: {
+    display: 'flex',
+    gap: '24px',
+    padding: '16px 32px',
+    background: '#16213e',
+    borderBottom: '1px solid #0f3460',
+  },
+  navLink: {
+    color: '#e94560',
+    textDecoration: 'none',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    letterSpacing: '1px',
+  },
+  container: {
+    maxWidth: '500px',
+    margin: '40px auto',
+    padding: '0 16px',
+  },
+  title: {
+    fontSize: '2.5rem',
+    textAlign: 'center',
+    marginBottom: '24px',
+    color: '#e94560',
+    letterSpacing: '4px',
+    textTransform: 'uppercase',
+  },
+  card: {
+    background: '#16213e',
+    borderRadius: '12px',
+    padding: '28px',
+    boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+  },
+  label: {
+    display: 'block',
+    marginBottom: '8px',
+    color: '#aaa',
+    fontSize: '14px',
+    letterSpacing: '1px',
+    textTransform: 'uppercase',
+  },
+  range: {
+    width: '100%',
+    margin: '8px 0 20px',
+    accentColor: '#e94560',
+  },
+  checkbox: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    marginBottom: '24px',
+    color: '#ccc',
+    cursor: 'pointer',
+  },
+  button: {
+    width: '100%',
+    padding: '12px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    letterSpacing: '2px',
+    textTransform: 'uppercase',
+    background: '#e94560',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+  },
+  guessRow: {
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '8px',
+    justifyContent: 'center',
+  },
+  tile: (result) => ({
+    width: '52px',
+    height: '52px',
+    borderRadius: '6px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 'bold',
+    fontSize: '20px',
+    background: result === 'correct' ? '#4caf50' : result === 'misplaced' ? '#ff9800' : '#c0392b',
+    color: '#fff',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+  }),
+  inputRow: {
+    display: 'flex',
+    gap: '10px',
+    marginTop: '20px',
+  },
+  input: {
+    flex: 1,
+    padding: '12px 16px',
+    fontSize: '18px',
+    borderRadius: '8px',
+    border: '2px solid #0f3460',
+    background: '#0f3460',
+    color: '#fff',
+    outline: 'none',
+    letterSpacing: '4px',
+    textTransform: 'uppercase',
+  },
+  guessButton: {
+    padding: '12px 20px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    background: '#e94560',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+  },
+  wonCard: {
+    marginTop: '24px',
+    background: '#16213e',
+    borderRadius: '12px',
+    padding: '24px',
+    textAlign: 'center',
+    boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+  },
+  wonTitle: {
+    fontSize: '1.8rem',
+    color: '#4caf50',
+    marginBottom: '8px',
+  },
+  nameInput: {
+    flex: 1,
+    padding: '10px 14px',
+    fontSize: '15px',
+    borderRadius: '8px',
+    border: '2px solid #0f3460',
+    background: '#0f3460',
+    color: '#fff',
+    outline: 'none',
+  },
+  submitButton: {
+    padding: '10px 18px',
+    background: '#4caf50',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+  },
+  error: {
+    color: '#e94560',
+    marginTop: '10px',
+    fontSize: '14px',
+    textAlign: 'center',
+  },
+  hint: {
+    textAlign: 'center',
+    color: '#888',
+    fontSize: '14px',
+    marginBottom: '16px',
+  },
+};
+
 const COLOR = {
   correct: '#4caf50',
   misplaced: '#ff9800',
-  incorrect: '#f44336',
+  incorrect: '#c0392b',
 };
 
 function checkGuess(guess, correctWord) {
@@ -102,118 +270,115 @@ export default function Game() {
   }
 
   return (
-    <div style={{ fontFamily: 'sans-serif', maxWidth: '500px', margin: '30px auto', padding: '0 16px' }}>
-      <h1>🟩 Wordle</h1>
+    <div style={styles.page}>
+      <nav style={styles.nav}>
+        <a href="/" style={styles.navLink}>🎮 Spela</a>
+        <a href="/highscore" style={styles.navLink}>🏆 Highscore</a>
+        <a href="/om" style={styles.navLink}>ℹ️ Om</a>
+      </nav>
 
-      {!secretWord && (
-        <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px' }}>
-          <h2>Inställningar</h2>
-          <label>Ordlängd: <strong>{wordLength}</strong></label><br />
-          <input
-            type="range" min="3" max="10"
-            value={wordLength}
-            onChange={e => setWordLength(Number(e.target.value))}
-            style={{ width: '100%', margin: '8px 0 16px' }}
-          />
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div style={styles.container}>
+        <h1 style={styles.title}>Wordle</h1>
+
+        {!secretWord && (
+          <div style={styles.card}>
+            <h2 style={{ marginBottom: '20px', color: '#ccc' }}>Inställningar</h2>
+
+            <label style={styles.label}>Ordlängd: <strong style={{ color: '#e94560' }}>{wordLength} bokstäver</strong></label>
             <input
-              type="checkbox"
-              checked={uniqueLetters}
-              onChange={e => setUniqueLetters(e.target.checked)}
+              type="range" min="3" max="10"
+              value={wordLength}
+              onChange={e => setWordLength(Number(e.target.value))}
+              style={styles.range}
             />
-            Bara unika bokstäver
-          </label>
-          <button
-            onClick={startGame}
-            disabled={loading}
-            style={{ marginTop: '16px', padding: '10px 24px', fontSize: '16px', cursor: 'pointer', background: '#333', color: '#fff', border: 'none', borderRadius: '6px' }}
-          >
-            {loading ? 'Laddar...' : 'Starta spelet'}
-          </button>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-        </div>
-      )}
 
-      {secretWord && (
-        <>
-          <p style={{ color: '#666' }}>Gissa ett ord med <strong>{wordLength}</strong> bokstäver.</p>
-          <div style={{ marginBottom: '16px' }}>
-            {guesses.map((g, i) => (
-              <div key={i} style={{ display: 'flex', gap: '6px', marginBottom: '6px' }}>
-                {g.feedback.map((f, j) => (
-                  <div key={j} style={{
-                    width: '40px', height: '40px',
-                    background: COLOR[f.result],
-                    color: '#fff',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: 'bold', fontSize: '18px',
-                    borderRadius: '4px'
-                  }}>
-                    {f.letter}
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-
-          {!won && (
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <label style={styles.checkbox}>
               <input
-                type="text"
-                value={guess}
-                onChange={e => setGuess(e.target.value.toUpperCase())}
-                onKeyDown={e => e.key === 'Enter' && handleGuess()}
-                maxLength={wordLength}
-                placeholder={`${wordLength} bokstäver...`}
-                style={{ padding: '10px', fontSize: '16px', flex: 1, borderRadius: '4px', border: '1px solid #ccc' }}
+                type="checkbox"
+                checked={uniqueLetters}
+                onChange={e => setUniqueLetters(e.target.checked)}
               />
-              <button
-                onClick={handleGuess}
-                style={{ padding: '10px 18px', fontSize: '16px', cursor: 'pointer', background: '#333', color: '#fff', border: 'none', borderRadius: '6px' }}
-              >
-                Gissa
-              </button>
-            </div>
-          )}
+              Bara unika bokstäver
+            </label>
 
-          {error && <p style={{ color: 'red' }}>{error}</p>}
+            <button onClick={startGame} disabled={loading} style={styles.button}>
+              {loading ? 'Laddar ord...' : 'Starta spelet'}
+            </button>
+            {error && <p style={styles.error}>{error}</p>}
+          </div>
+        )}
 
-          {won && (
-            <div style={{ marginTop: '20px', background: '#e8f5e9', padding: '20px', borderRadius: '8px' }}>
-              <h2>🎉 Rätt! Ordet var <strong>{secretWord}</strong></h2>
-              <p>Tid: <strong>{((endTime - startTime) / 1000).toFixed(1)}s</strong> | Gissningar: <strong>{guesses.length}</strong></p>
-              {!submitted ? (
-                <>
-                  <p>Ange ditt namn för highscore:</p>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <input
-                      type="text"
-                      value={playerName}
-                      onChange={e => setPlayerName(e.target.value)}
-                      placeholder="Ditt namn"
-                      style={{ padding: '8px', fontSize: '15px', flex: 1, borderRadius: '4px', border: '1px solid #ccc' }}
-                    />
-                    <button
-                      onClick={submitScore}
-                      style={{ padding: '8px 16px', cursor: 'pointer', background: '#4caf50', color: '#fff', border: 'none', borderRadius: '6px' }}
-                    >
-                      Skicka
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <p>✅ Resultat sparat! <a href="/highscore">Se highscore</a></p>
-              )}
-              <button
-                onClick={startGame}
-                style={{ marginTop: '12px', padding: '10px 20px', cursor: 'pointer', background: '#333', color: '#fff', border: 'none', borderRadius: '6px' }}
-              >
-                Spela igen
-              </button>
+        {secretWord && (
+          <>
+            <p style={styles.hint}>Gissa ett ord med <strong>{wordLength}</strong> bokstäver</p>
+
+            <div style={{ marginBottom: '16px' }}>
+              {guesses.map((g, i) => (
+                <div key={i} style={styles.guessRow}>
+                  {g.feedback.map((f, j) => (
+                    <div key={j} style={styles.tile(f.result)}>
+                      {f.letter}
+                    </div>
+                  ))}
+                </div>
+              ))}
             </div>
-          )}
-        </>
-      )}
+
+            {!won && (
+              <div style={styles.inputRow}>
+                <input
+                  type="text"
+                  value={guess}
+                  onChange={e => setGuess(e.target.value.toUpperCase())}
+                  onKeyDown={e => e.key === 'Enter' && handleGuess()}
+                  maxLength={wordLength}
+                  placeholder={'_ '.repeat(wordLength).trim()}
+                  style={styles.input}
+                />
+                <button onClick={handleGuess} style={styles.guessButton}>
+                  Gissa
+                </button>
+              </div>
+            )}
+
+            {error && <p style={styles.error}>{error}</p>}
+
+            {won && (
+              <div style={styles.wonCard}>
+                <div style={styles.wonTitle}>🎉 Rätt!</div>
+                <p>Ordet var <strong style={{ color: '#e94560' }}>{secretWord}</strong></p>
+                <p style={{ color: '#aaa' }}>
+                  Tid: <strong style={{ color: '#fff' }}>{((endTime - startTime) / 1000).toFixed(1)}s</strong>
+                  &nbsp;·&nbsp;
+                  Gissningar: <strong style={{ color: '#fff' }}>{guesses.length}</strong>
+                </p>
+
+                {!submitted ? (
+                  <>
+                    <p style={{ color: '#aaa', marginBottom: '10px' }}>Ange ditt namn för highscore:</p>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <input
+                        type="text"
+                        value={playerName}
+                        onChange={e => setPlayerName(e.target.value)}
+                        placeholder="Ditt namn..."
+                        style={styles.nameInput}
+                      />
+                      <button onClick={submitScore} style={styles.submitButton}>Skicka</button>
+                    </div>
+                  </>
+                ) : (
+                  <p style={{ color: '#4caf50' }}>✅ Sparat! <a href="/highscore" style={{ color: '#e94560' }}>Se highscore</a></p>
+                )}
+
+                <button onClick={startGame} style={{ ...styles.button, marginTop: '16px' }}>
+                  Spela igen
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
